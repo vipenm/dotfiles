@@ -1,5 +1,76 @@
 #!/usr/bin/env bash
 
+alias bprofile='sudo vim ~/.bash_profile'
+alias hosts='sudo vim /etc/hosts'
+alias docker-ssh='echo -n "Container Name: "; read ENV; docker exec -it $ENV /bin/bash'
+alias ec2='ssh -i ~/.ssh/vipen_rsa -l ec2-user'
+alias branch=fork_from_correct_branch
+alias showchangedfiles='git diff --name-status'
+alias findip='~/Documents/index.js'
+alias sym='~/Documents/sym.sh'
+alias startup='phpbrew fpm start && phpbrew switch 5.6.40 && phpbrew fpm start && phpbrew switch 7.1.30 && phpbrew fpm start && sudo nginx'
+alias gettemp='sudo powermetrics --samplers smc |grep -i "CPU die temperature"'
+alias culturecastec2='ec2 184.72.150.106'
+alias php56='sudo update-alternatives --set php /usr/bin/php5.6'
+alias php73='sudo update-alternatives --set php /usr/bin/php7.3'
+alias balias='sudo vim ~/.aliases'
+
+function fork_from_correct_branch {
+  local CURRENT_GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'`
+  local CURRENT='['$CURRENT_GIT_BRANCH$']'
+
+  if [[ $CURRENT_GIT_BRANCH =~ .*master.* ]]
+  then
+    read -p "What's the name of the new branch? " -r
+    git checkout -b $REPLY
+  else
+    echo $'\e[93m'!!WARNING!!$'\e[0m'
+    read -p "You are trying to branch from $(get_git_color)$CURRENT"$'\e[0m'" is this correct? [yes/no] " -r
+    if [[ $REPLY =~ yes ]] ||  [[ $REPLY =~ Yes ]] ||  [[ $REPLY =~ y ]] ||  [[ $REPLY =~ Y ]]
+    then
+      read -p "What's the name of the new branch? " -r
+      git checkout -b $REPLY
+    fi
+  fi
+}
+
+function get_git_color {
+  local CURRENT_GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'`
+  #local CURRENT_GIT_BRANCH=`parse_git_branch_name`
+  if [[ $CURRENT_GIT_BRANCH =~ .*master.* ]]
+  then
+    #Red for master
+    echo $'\e[38;5;196m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*master_integration.* ]]
+  then
+    #Red for master_integration
+    echo $'\e[38;5;196m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*develop.* ]]
+  then
+    #Green for develop
+    echo $'\e[0;32m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*integration.* ]]
+  then
+    #Green for develop
+    echo $'\e[0;32m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*feature/.* ]]
+  then
+    #Blue for features
+    echo $'\e[38;5;45m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*hotfix/.* ]]
+  then
+    #Orange for hotfixes
+    echo $'\e[38;5;202m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*release/.* ]]
+  then
+    #Bright Yellow for releases
+    echo $'\e[38;5;226m'
+  else
+    #Lemon for everything else
+    echo $'\e[38;5;5m'
+  fi
+}
+
 # Easier navigation: .., ..., ...., ....., ~ and -
 alias ..="cd .."
 alias ...="cd ../.."

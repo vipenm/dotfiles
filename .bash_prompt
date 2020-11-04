@@ -14,6 +14,7 @@ fi;
 prompt_git() {
 	local s='';
 	local branchName='';
+	local color='';
 
 	# Check if the current directory is in a Git repository.
 	git rev-parse --is-inside-work-tree &>/dev/null || return;
@@ -54,7 +55,39 @@ prompt_git() {
 
 	[ -n "${s}" ] && s=" [${s}]";
 
-	echo -e "${1}${branchName}${2}${s}";
+	if [[ ${branchName} =~ .*master.* ]]; then
+			color="\e[1;31m";
+		elif [[ ${branchName} =~ .*develop.* ]]; then
+			color="\e[1;32m";
+		else
+			color="\e[1;36m";
+		fi;
+
+	echo -e "${1} ${color}[${branchName}]${s}";
+}
+
+get_branch_color() {
+	local branchName='';
+
+	# Check if the current directory is in a Git repository.
+	git rev-parse --is-inside-work-tree &>/dev/null || return;
+
+	# Check for what branch we’re on.
+	# Get the short symbolic ref. If HEAD isn’t a symbolic ref, get a
+	# tracking remote branch or tag. Otherwise, get the
+	# short SHA for the latest commit, or give up.
+	branchName="$(git symbolic-ref --quiet --short HEAD 2> /dev/null || \
+		git describe --all --exact-match HEAD 2> /dev/null || \
+		git rev-parse --short HEAD 2> /dev/null || \
+		echo '(unknown)')";
+
+		if [[ ${branchName} =~ .*master.* ]]; then
+			return "\e[1;31m";
+		elif [[ ${branchName} =~ .*develop.* ]]; then
+			return "\e[1;32m";
+		else
+			return "\e[1;36m";
+		fi;
 }
 
 if tput setaf 1 &> /dev/null; then
@@ -104,12 +137,12 @@ fi;
 # Set the terminal title and prompt.
 PS1="\[\033]0;\W\007\]"; # working directory base name
 PS1+="\[${bold}\]\n"; # newline
-PS1+="\[${userStyle}\]\u"; # username
-PS1+="\[${white}\] at ";
-PS1+="\[${hostStyle}\]\h"; # host
-PS1+="\[${white}\] in ";
-PS1+="\[${green}\]\w"; # working directory full path
-PS1+="\$(prompt_git \"\[${white}\] on \[${violet}\]\" \"\[${blue}\]\")"; # Git repository details
+#PS1+="\[${userStyle}\]\u"; # username
+#PS1+="\[${white}\] at ";
+#PS1+="\[${hostStyle}\]\h"; # host
+#PS1+="\[${white}\] in ";
+PS1+="\[${bold}\]\w"; # working directory full path
+PS1+="\$(prompt_git \"\[${blue}\]\")"; # Git repository details
 PS1+="\n";
 PS1+="\[${white}\]\$ \[${reset}\]"; # `$` (and reset color)
 export PS1;
