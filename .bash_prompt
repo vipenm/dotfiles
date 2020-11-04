@@ -11,6 +11,43 @@ elif infocmp xterm-256color >/dev/null 2>&1; then
 	export TERM='xterm-256color';
 fi;
 
+function get_git_color {
+  local CURRENT_GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'`
+  #local CURRENT_GIT_BRANCH=`parse_git_branch_name`
+  if [[ $CURRENT_GIT_BRANCH =~ .*master.* ]]
+  then
+    #Red for master
+    echo $'\e[38;5;196m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*master_integration.* ]]
+  then
+    #Red for master_integration
+    echo $'\e[38;5;196m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*develop.* ]]
+  then
+    #Green for develop
+    echo $'\e[0;32m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*integration.* ]]
+  then
+    #Green for develop
+    echo $'\e[0;32m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*feature/.* ]]
+  then
+    #Blue for features
+    echo $'\e[38;5;45m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*hotfix/.* ]]
+  then
+    #Orange for hotfixes
+    echo $'\e[38;5;202m'
+  elif [[ $CURRENT_GIT_BRANCH =~ .*release/.* ]]
+  then
+    #Bright Yellow for releases
+    echo $'\e[38;5;226m'
+  else
+    #Lemon for everything else
+    echo $'\e[38;5;5m'
+  fi
+}
+
 prompt_git() {
 	local s='';
 	local branchName='';
@@ -55,39 +92,7 @@ prompt_git() {
 
 	[ -n "${s}" ] && s=" [${s}]";
 
-	if [[ ${branchName} =~ .*master.* ]]; then
-			color="\e[1;31m";
-		elif [[ ${branchName} =~ .*develop.* ]]; then
-			color="\e[1;32m";
-		else
-			color="\e[1;36m";
-		fi;
-
-	echo -e "${1} ${color}[${branchName}]${s}";
-}
-
-get_branch_color() {
-	local branchName='';
-
-	# Check if the current directory is in a Git repository.
-	git rev-parse --is-inside-work-tree &>/dev/null || return;
-
-	# Check for what branch we’re on.
-	# Get the short symbolic ref. If HEAD isn’t a symbolic ref, get a
-	# tracking remote branch or tag. Otherwise, get the
-	# short SHA for the latest commit, or give up.
-	branchName="$(git symbolic-ref --quiet --short HEAD 2> /dev/null || \
-		git describe --all --exact-match HEAD 2> /dev/null || \
-		git rev-parse --short HEAD 2> /dev/null || \
-		echo '(unknown)')";
-
-		if [[ ${branchName} =~ .*master.* ]]; then
-			return "\e[1;31m";
-		elif [[ ${branchName} =~ .*develop.* ]]; then
-			return "\e[1;32m";
-		else
-			return "\e[1;36m";
-		fi;
+	echo -e "${1}" $(get_git_color)"[${branchName}]${s}";
 }
 
 if tput setaf 1 &> /dev/null; then
