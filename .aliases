@@ -81,7 +81,7 @@ alias -- -="cd -"
 
 # Shortcuts
 alias d="cd ~/Documents/Dropbox"
-alias dl="cd ~/Downloads"
+alias dl="cd ~/A/Downloads"
 alias dt="cd ~/Desktop"
 alias p="cd ~/A/GitProjects"
 alias g="git"
