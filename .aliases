@@ -13,6 +13,7 @@ alias php56='sudo update-alternatives --set php /usr/bin/php5.6'
 alias php73='sudo update-alternatives --set php /usr/bin/php7.3'
 alias balias='sudo vim ~/.aliases'
 
+
 function fork_from_correct_branch {
   local CURRENT_GIT_BRANCH=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\\1/'`
   local CURRENT='['$CURRENT_GIT_BRANCH$']'
