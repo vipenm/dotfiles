@@ -12,6 +12,7 @@ alias culturecastec2='ec2 184.72.150.106'
 alias php56='sudo update-alternatives --set php /usr/bin/php5.6'
 alias php73='sudo update-alternatives --set php /usr/bin/php7.3'
 alias balias='sudo vim ~/.aliases'
+alias masseydevec2='ssh -i ~/.ssh/vipen_rsa -l ec2-user 54.156.167.231'
 
 
 function fork_from_correct_branch {
